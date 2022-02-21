@@ -1,10 +1,19 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
+from .models import Article
 
 def index(request):
+  articles = Article.objects.all()
   context = {
-    'message':'welcom my bbs',
-    'players':['勇者','戦士','魔法使い','忍者']
+    'message':'welcome my bbs',
+    'articles': articles,
   }
   return render(request, 'bbs/index.html',context)
 
+def detail(request, id):
+  article = get_object_or_404(Article, pk=id)
+  context = {
+    'message':'show article' + str(id),
+    'article':article
+  }
+  return render(request, 'bbs/detail.html', context)
