@@ -1,12 +1,23 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import Article
+from .forms import SearchForm
+from .forms import ArticleForm
 
 def index(request):
-  articles = Article.objects.all()
+  searchForm = SearchForm(request.GET)
+  if searchForm.is_valid():
+    keyword = searchForm.cleaned_data['keyword']
+    articles = Article.objects.filter(content__contains=keyword)
+  else:
+    searchForm = SearchForm()
+    articles = Article.objects.all()
+
+
   context = {
     'message':'welcome my bbs',
     'articles': articles,
+    'searchForm': searchForm,
   }
   return render(request, 'bbs/index.html',context)
 
@@ -18,6 +29,15 @@ def detail(request, id):
   }
   return render(request, 'bbs/detail.html', context)
 
+def new(request):
+  articleForm = ArticleForm()
+  context = {
+    'message' : 'New Article',
+    'articleForm' : articleForm,
+  }
+  return render(request, 'bbs/new/html', context)
+
+
 def create(request):
   article = Article(content='hello bbs',user_name='mori')
   article.save()
@@ -27,6 +47,12 @@ def create(request):
     'articles': articles,
   }
   return render(request, 'bbs/index.html',context)
+
+def edit(request, id):
+  return HttpResponse('this is edit' + str(id))
+
+def update(request, id):
+  return HttpResponse('this is update' + str(id))
 
 def delete(request, id):
   article = get_object_or_404(Article, pk=id)
