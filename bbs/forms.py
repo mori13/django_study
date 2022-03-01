@@ -7,4 +7,4 @@ class SearchForm(forms.Form):
 class ArticleForm(forms.ModelForm):
   class Meta:
     model = Article
-    fields = ('contact','user_name')
+    fields = ('content','user_name')

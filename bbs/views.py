@@ -13,13 +13,13 @@ def index(request):
     searchForm = SearchForm()
     articles = Article.objects.all()
 
-
   context = {
     'message':'welcome my bbs',
     'articles': articles,
     'searchForm': searchForm,
   }
   return render(request, 'bbs/index.html',context)
+
 
 def detail(request, id):
   article = get_object_or_404(Article, pk=id)
@@ -35,24 +35,43 @@ def new(request):
     'message' : 'New Article',
     'articleForm' : articleForm,
   }
-  return render(request, 'bbs/new/html', context)
+  return render(request, 'bbs/new.html', context)
 
 
 def create(request):
-  article = Article(content='hello bbs',user_name='mori')
-  article.save()
-  articles = Article.objects.all()
+  if request.method == 'POST':
+      articleForm = ArticleForm(request.POST)
+      if articleForm.is_valid():
+          article = articleForm.save()
+
   context = {
-    'message':'Create article',
-    'articles': articles,
+    'message': 'Create article ' + str(article.id),
+    'article': article,
   }
-  return render(request, 'bbs/index.html',context)
+  return render(request, 'bbs/detail.html',context)
 
 def edit(request, id):
-  return HttpResponse('this is edit' + str(id))
+  article = get_object_or_404(Article, pk=id)
+  articleForm = ArticleForm(instance=article)
+  context = {
+  'message':'edit article' + str(id),
+  'article':article,
+  'articleForm': articleForm,
+  }
+  return render(request, 'bbs/edit.html', context)
 
 def update(request, id):
-  return HttpResponse('this is update' + str(id))
+  if request.method == 'POST':
+      article = get_object_or_404(Article, pk=id)
+      articleForm = ArticleForm(request.POST)
+      if articleForm.is_valid():
+          article = articleForm.save()
+
+  context = {
+    'message': 'Update article ' + str(article.id),
+    'article': article,
+  }
+  return render(request, 'bbs/detail.html',context)
 
 def delete(request, id):
   article = get_object_or_404(Article, pk=id)
